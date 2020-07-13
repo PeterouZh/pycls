@@ -32,7 +32,8 @@ def _construct_loader(dataset_name, split, batch_size, shuffle, drop_last):
     err_str = "Dataset '{}' not supported".format(dataset_name)
     assert dataset_name in _DATASETS and dataset_name in _PATHS, err_str
     # Retrieve the data path for the dataset
-    data_path = os.path.join(_DATA_DIR, _PATHS[dataset_name])
+    # data_path = os.path.join(_DATA_DIR, _PATHS[dataset_name])
+    data_path = cfg.data_path
     # Construct the dataset
     dataset = _DATASETS[dataset_name](data_path, split)
     # Create a sampler for multi-process training
