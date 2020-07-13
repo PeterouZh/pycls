@@ -16,9 +16,11 @@ from pycls.datasets.imagenet import ImageNet
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
+from mask_per_channel.cifar10_mask import Cifar10_MaskPerChannel
 
 # Supported datasets
-_DATASETS = {"cifar10": Cifar10, "imagenet": ImageNet}
+_DATASETS = {"cifar10": Cifar10, "imagenet": ImageNet,
+             "cifar10_mask_per_channel": Cifar10_MaskPerChannel}
 
 # Default data directory (/path/pycls/pycls/datasets/data)
 _DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -30,7 +32,7 @@ _PATHS = {"cifar10": "cifar10", "imagenet": "imagenet"}
 def _construct_loader(dataset_name, split, batch_size, shuffle, drop_last):
     """Constructs the data loader for the given dataset."""
     err_str = "Dataset '{}' not supported".format(dataset_name)
-    assert dataset_name in _DATASETS and dataset_name in _PATHS, err_str
+    # assert dataset_name in _DATASETS and dataset_name in _PATHS, err_str
     # Retrieve the data path for the dataset
     # data_path = os.path.join(_DATA_DIR, _PATHS[dataset_name])
     data_path = cfg.data_path
