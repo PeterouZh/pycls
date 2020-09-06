@@ -360,6 +360,12 @@ _C.PORT_RANGE = [10000, 65000]
 # Models weights referred to by URL are downloaded to this local cache
 _C.DOWNLOAD_CACHE = "/tmp/pycls-download-cache"
 
+# ------------------------------------------------------------------------------------ #
+# Default config
+# ------------------------------------------------------------------------------------ #
+_CFG_DEFAULT = _C.clone()
+_CFG_DEFAULT.freeze()
+
 
 # ------------------------------------------------------------------------------------ #
 # Deprecated keys
@@ -405,6 +411,10 @@ def load_cfg(out_dir, cfg_dest="config.yaml"):
     cfg_file = os.path.join(out_dir, cfg_dest)
     _C.merge_from_file(cfg_file)
 
+
+def reset_cfg():
+    """Reset config to initial state."""
+    cfg.merge_from_other_cfg(_CFG_DEFAULT)
 
 def load_cfg_fom_args(parse_list, description="Config file options."):
     """Load config from command line arguments and set any specified options."""
