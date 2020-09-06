@@ -9,7 +9,7 @@
 
 import os
 
-import pycls.core.builders as builders
+# import pycls.core.builders as builders
 import pycls.core.checkpoint as cp
 from pycls.core.config import cfg, reset_cfg
 from pycls.core.io import cache_url
@@ -138,6 +138,7 @@ def get_model_info(name):
 
 def build_model(name, pretrained=False, cfg_list=()):
     """Constructs a predefined model (note: loads global config as well)."""
+    import pycls.core.builders as builders
     # Load the config
     reset_cfg()
     config_file = get_config_file(name)

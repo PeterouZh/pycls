@@ -23,7 +23,9 @@ import pycls.datasets.loader as loader
 import torch
 from pycls.core.config import cfg
 
-from template_lib.trainer.base_trainer import summary_dict2txtfig
+from template_lib.v2.logger import summary_dict2txtfig
+from template_lib.v2.logger import global_textlogger as textlogger
+
 
 logger = logging.get_logger(__name__)
 
@@ -70,7 +72,7 @@ def setup_model():
     return model
 
 
-def train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch, myargs=None):
+def train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch):
     """Performs one epoch of training."""
     # Shuffle the data
     loader.shuffle(train_loader, cur_epoch)
@@ -106,15 +108,15 @@ def train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch
         train_meter.iter_tic()
     # Log epoch stats
     train_meter.log_epoch_stats(cur_epoch)
-    if myargs:
-        stats = train_meter.get_epoch_stats(cur_epoch)
-        stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
-        summary_dict2txtfig(stats, prefix='train', step=cur_epoch, textlogger=myargs.textlogger, save_fig_sec=60)
+
+    stats = train_meter.get_epoch_stats(cur_epoch)
+    stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
+    summary_dict2txtfig(stats, prefix='train', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
     train_meter.reset()
 
 
 @torch.no_grad()
-def test_epoch(test_loader, model, test_meter, cur_epoch, myargs=None):
+def test_epoch(test_loader, model, test_meter, cur_epoch):
     """Evaluates the model on the test set."""
     # Enable eval mode
     model.eval()
@@ -137,14 +139,14 @@ def test_epoch(test_loader, model, test_meter, cur_epoch, myargs=None):
         test_meter.iter_tic()
     # Log epoch stats
     test_meter.log_epoch_stats(cur_epoch)
-    if myargs:
-        stats = test_meter.get_epoch_stats(cur_epoch)
-        stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
-        summary_dict2txtfig(stats, prefix='test', step=cur_epoch, textlogger=myargs.textlogger, save_fig_sec=60)
+
+    stats = test_meter.get_epoch_stats(cur_epoch)
+    stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
+    summary_dict2txtfig(stats, prefix='test', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
     test_meter.reset()
 
 
-def train_model(myargs):
+def train_model():
     """Trains the model."""
     # Setup training/testing environment
     setup_env()
@@ -174,7 +176,7 @@ def train_model(myargs):
     logger.info("Start epoch: {}".format(start_epoch + 1))
     for cur_epoch in range(start_epoch, cfg.OPTIM.MAX_EPOCH):
         # Train for one epoch
-        train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch, myargs=myargs)
+        train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch)
         # Compute precise BN stats
         if cfg.BN.USE_PRECISE_STATS:
             net.compute_precise_bn_stats(model, train_loader)
@@ -185,7 +187,7 @@ def train_model(myargs):
         # Evaluate the model
         next_epoch = cur_epoch + 1
         if next_epoch % cfg.TRAIN.EVAL_PERIOD == 0 or next_epoch == cfg.OPTIM.MAX_EPOCH:
-            test_epoch(test_loader, model, test_meter, cur_epoch, myargs=myargs)
+            test_epoch(test_loader, model, test_meter, cur_epoch)
 
 
 def test_model():

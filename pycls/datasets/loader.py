@@ -16,7 +16,7 @@ from pycls.datasets.imagenet import ImageNet
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 
-from mask_per_channel.cifar10_mask import Cifar10_MaskPerChannel
+from exp.mask_per_channel.cifar10_mask import Cifar10_MaskPerChannel
 
 # Supported datasets
 _DATASETS = {"cifar10": Cifar10, "imagenet": ImageNet,

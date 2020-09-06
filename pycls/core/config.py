@@ -14,6 +14,7 @@ import sys
 from pycls.core.io import cache_url
 from yacs.config import CfgNode as CfgNode
 
+from template_lib.v2.config import update_parser_defaults_from_yaml
 
 # Global config object
 _C = CfgNode()
@@ -416,16 +417,19 @@ def reset_cfg():
     """Reset config to initial state."""
     cfg.merge_from_other_cfg(_CFG_DEFAULT)
 
-def load_cfg_fom_args(parse_list, description="Config file options."):
+def load_cfg_fom_args(description="Config file options."):
     """Load config from command line arguments and set any specified options."""
     parser = argparse.ArgumentParser(description=description)
     help_s = "Config file location"
     parser.add_argument("--cfg", dest="cfg_file", help=help_s, required=True, type=str)
     help_s = "See pycls/core/config.py for all options"
     parser.add_argument("opts", help=help_s, default=None, nargs=argparse.REMAINDER)
-    # if len(sys.argv) == 1:
-    #     parser.print_help()
-    #     sys.exit(1)
-    args = parser.parse_args(parse_list)
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
+    update_parser_defaults_from_yaml(parser)
+
+    args = parser.parse_args()
     _C.merge_from_file(args.cfg_file)
     _C.merge_from_list(args.opts)
