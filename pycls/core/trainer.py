@@ -108,6 +108,7 @@ def train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch
         train_meter.iter_tic()
     # Log epoch stats
     train_meter.log_epoch_stats(cur_epoch)
+    print(f'{cfg.OUT_DIR}')
 
     stats = train_meter.get_epoch_stats(cur_epoch)
     stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}

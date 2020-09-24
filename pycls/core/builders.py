@@ -14,12 +14,20 @@ from pycls.models.effnet import EffNet
 from pycls.models.regnet import RegNet
 from pycls.models.resnet import ResNet
 
+from exp.cmconv_cls.model_resnet_cmconv_cls import ResNetCMConvCls
+from exp.cmconv_cls.loss_cmconv_ce import CMConvCE
+from exp.cmconv_cls.model_resnet_smconv_cls import ResNetSMConv
+from exp.cmconv_cls.model_resnet_smconv_with_loss import ResNetSMConvLoss
 
 # Supported models
-_models = {"anynet": AnyNet, "effnet": EffNet, "resnet": ResNet, "regnet": RegNet}
+_models = {"anynet": AnyNet, "effnet": EffNet, "resnet": ResNet, "regnet": RegNet,
+           "resnet_cmconv_cls": ResNetCMConvCls,
+           'resnet_smconv': ResNetSMConv,
+           'resnet_smconv_with_loss': ResNetSMConvLoss}
 
 # Supported loss functions
-_loss_funs = {"cross_entropy": torch.nn.CrossEntropyLoss}
+_loss_funs = {"cross_entropy": torch.nn.CrossEntropyLoss,
+              "cmconv_cross_entropy": CMConvCE}
 
 
 def get_model():

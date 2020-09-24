@@ -6,6 +6,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Train a classification model."""
+import importlib
 
 import pycls.core.config as config
 import pycls.core.distributed as dist
@@ -22,7 +23,10 @@ def main():
     D2Utils.cfg_merge_from_easydict(cfg, global_cfg)
 
     cfg.freeze()
-    dist.multi_proc_run(num_proc=cfg.NUM_GPUS, fun=trainer.train_model)
+
+    trainer_module = cfg.get('trainer_module', 'pycls.core.trainer')
+    trainer_module = importlib.import_module(trainer_module)
+    dist.multi_proc_run(num_proc=cfg.NUM_GPUS, fun=trainer_module.train_model)
 
 
 if __name__ == "__main__":
