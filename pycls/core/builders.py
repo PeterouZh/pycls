@@ -19,12 +19,15 @@ from exp.cmconv_cls.loss_cmconv_ce import CMConvCE
 from exp.cmconv_cls.model_resnet_smconv_cls import ResNetSMConv
 from exp.cmconv_cls.model_resnet_smconv_with_loss import ResNetSMConvLoss
 from exp.random_multiple_label.loss_random_multiple_ce import Random_MultiLabel_CE
+from exp.transformer_cnn.transformer_resnet import TResNet
 
 # Supported models
 _models = {"anynet": AnyNet, "effnet": EffNet, "resnet": ResNet, "regnet": RegNet,
            "resnet_cmconv_cls": ResNetCMConvCls,
            'resnet_smconv': ResNetSMConv,
-           'resnet_smconv_with_loss': ResNetSMConvLoss}
+           'resnet_smconv_with_loss': ResNetSMConvLoss,
+           'transformer_resnet': TResNet,
+           }
 
 # Supported loss functions
 _loss_funs = {"cross_entropy": torch.nn.CrossEntropyLoss,

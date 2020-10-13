@@ -29,7 +29,8 @@ def init_weights(m):
         m.bias.data.zero_()
     elif isinstance(m, nn.Linear):
         m.weight.data.normal_(mean=0.0, std=0.01)
-        m.bias.data.zero_()
+        if m.bias is not None:
+            m.bias.data.zero_()
 
 
 def unwrap_model(model):
