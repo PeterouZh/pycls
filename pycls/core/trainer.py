@@ -82,6 +82,7 @@ def train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch
     optim.set_lr(optimizer, lr)
     # Enable training mode
     model.train()
+    train_meter.reset()
     train_meter.iter_tic()
     for cur_iter, (inputs, labels) in enumerate(train_loader):
         # Transfer the data to the current GPU device
@@ -111,10 +112,10 @@ def train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch
     train_meter.log_epoch_stats(cur_epoch)
     print(f'{cfg.OUT_DIR}')
 
-    stats = train_meter.get_epoch_stats(cur_epoch)
-    stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
-    summary_dict2txtfig(stats, prefix='train', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
-    train_meter.reset()
+    if not hasattr(cfg, 'search_epoch'):
+        stats = train_meter.get_epoch_stats(cur_epoch)
+        stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
+        summary_dict2txtfig(stats, prefix='train', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
 
 
 @torch.no_grad()
@@ -144,8 +145,9 @@ def test_epoch(test_loader, model, test_meter, cur_epoch):
     test_meter.log_epoch_stats(cur_epoch)
 
     stats = test_meter.get_epoch_stats(cur_epoch)
-    stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
-    summary_dict2txtfig(stats, prefix='test', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
+    if not hasattr(cfg, 'search_epoch'):
+        stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
+        summary_dict2txtfig(stats, prefix='test', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
 
     return stats
 
@@ -179,6 +181,9 @@ def train_model():
     # Perform the training loop
     logger.info("Start epoch: {}".format(start_epoch + 1))
     for cur_epoch in range(start_epoch, cfg.OPTIM.MAX_EPOCH):
+        if hasattr(cfg, 'search_epoch'):
+            if cur_epoch >= cfg.search_epoch:
+                break
         # Train for one epoch
         train_epoch(train_loader, model, loss_fun, optimizer, train_meter, cur_epoch)
         # Compute precise BN stats
