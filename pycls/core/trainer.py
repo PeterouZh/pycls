@@ -25,6 +25,7 @@ from pycls.core.config import cfg
 
 from template_lib.v2.logger import summary_dict2txtfig
 from template_lib.v2.logger import global_textlogger as textlogger
+import nni
 
 
 logger = logging.get_logger(__name__)
@@ -121,6 +122,7 @@ def test_epoch(test_loader, model, test_meter, cur_epoch):
     """Evaluates the model on the test set."""
     # Enable eval mode
     model.eval()
+    test_meter.reset()
     test_meter.iter_tic()
     for cur_iter, (inputs, labels) in enumerate(test_loader):
         # Transfer the data to the current GPU device
@@ -144,7 +146,8 @@ def test_epoch(test_loader, model, test_meter, cur_epoch):
     stats = test_meter.get_epoch_stats(cur_epoch)
     stats = {k: v for k, v in stats.items() if isinstance(v, (int, float))}
     summary_dict2txtfig(stats, prefix='test', step=cur_epoch, textlogger=textlogger, save_fig_sec=60)
-    test_meter.reset()
+
+    return stats
 
 
 def train_model():
@@ -188,7 +191,9 @@ def train_model():
         # Evaluate the model
         next_epoch = cur_epoch + 1
         if next_epoch % cfg.TRAIN.EVAL_PERIOD == 0 or next_epoch == cfg.OPTIM.MAX_EPOCH:
-            test_epoch(test_loader, model, test_meter, cur_epoch)
+            stats = test_epoch(test_loader, model, test_meter, cur_epoch)
+            nni.report_intermediate_result(stats['top1_err'])
+    nni.report_final_result(test_meter.min_top1_err)
 
 
 def test_model():
